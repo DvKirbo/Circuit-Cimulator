@@ -14,8 +14,14 @@ BLANCO = 255,255,255
 
 def drawCircle (mouse_position):
     pygame.draw.circle(screen,BLANCO,mouse_position,10 )
+    
     pass
 
+
+def linea_recta(mouse_position):
+    cont_x=0
+    cont_y=0
+    pass
 
 pygame.init ()
 width, height = 600, 600 #tama no de la ventana
@@ -62,6 +68,7 @@ while run:#logica que se ejecutara durante todo el simulador
             drawCircle(mouse_position)
             pass
         #print(event)
+
 
         elif event.type == pygame.QUIT:
             run =False
