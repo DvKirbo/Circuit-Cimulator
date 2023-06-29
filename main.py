@@ -24,16 +24,24 @@ def drawNodo (mouse_position):
     #procedemos a guardar todo
     if len(posiciones)>=1:
         x1, y1 = posiciones[cont-1]
-        if(abs(x1 - a) > abs(y1 - b)):
-            if(x1 > a):
-                posiciones.append([x1-100,y1])
-            else:
-                posiciones.append([x1+100,y1])
-        elif(abs(x1 - a) < abs(y1 - b)):
-            if(y1 > a):
-                posiciones.append([x1,y1-100])
-            else:
-                posiciones.append([x1,y1+100])
+        if(round((a-x1)/100) != 0):
+            a = round((a-x1)/100)*100+x1
+        elif round((a-x1)/100) == 0:
+            #if ((a-x1)/100) > 0:
+                #a = x1+100
+            #else:
+                #a = x1-100
+            a = x1
+
+        if(round((b-y1)/100) != 0):
+            b = round((b-y1)/100)*100+y1
+        elif round((b-y1)/100) == 0:
+            #if ((b-y1)/100) > 0:
+                #b = y1+100
+            #else:
+                #b = y1-100
+            b = y1
+        posiciones.append([a,b])
     else:
         posiciones.append([a,b])
     pygame.draw.circle(screen,BLANCO,posiciones[cont],5)                  
@@ -98,14 +106,14 @@ def estado_normal(i):
 
 
 pygame.init ()
-width, height = 650, 1000 #tama no de la ventana
-screen = pygame.display.set_mode((height, width))
+width, height = 1200, 600 #tama no de la ventana
+screen = pygame.display.set_mode((width, height))
 bg = 25,25,25 #rgb colors
 screen.fill(bg)#llenamos o pintamos de ese color
 
 #creando la malla
-nxC, nyC = 20,20
-dimxC= width/nxC
+nxC, nyC = 30,20
+dimxC= (width-300)/nxC
 dimyC= height/nyC
 #dimensiones
 #colores rgb (255,255,255)
@@ -120,8 +128,8 @@ while run:#logica que se ejecutara durante todo el simulador
     mouse_position = pygame.mouse.get_pos()#no estoy tomando la posicion del mous
     #creamos colider para el puntero
     
-    for y in range (0,nxC):
-        for x in range (0,nyC):
+    for y in range (0,nyC):
+        for x in range (0,nxC):
             poly =[
                 ((x)*dimxC,y*dimyC),
                 ((x+1)*dimxC, y*dimyC),
@@ -148,9 +156,13 @@ while run:#logica que se ejecutara durante todo el simulador
                 print(f"Nodo: {chr(LETRAS)} creado")
 
                 drawNodo(mouse_position)
-                #if pygame.mouse.get_pressed()[0]:
-                    #if len(nodos)>1:
-                        #rawlines()
+                if event.type == pygame.KEYDOWN:
+                    key_name = pygame.key.name(event.key)
+                    if key_name == 'space':
+                        if pygame.mouse.get_pressed()[0]:
+                            if len(nodos)>1:
+                                drawlines()
+
                 if pygame.mouse.get_pressed()[2]:
                     if len(nodos)>1:
                         x,y = mouse_position
@@ -175,7 +187,6 @@ while run:#logica que se ejecutara durante todo el simulador
                 reactCircle(mouse_position, i)
                 i+=1 
         
-
     pygame.display.update()
 
 pygame.quit()
