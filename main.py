@@ -1,12 +1,12 @@
 import core2 as core
 import pygame
+import keyboard
 import math
 import time
 
 
 nodos = []#arrays de los nodos creados
 Nombre_nodos= []#array de los nombres de los nodos q vamos a utilizar
-array_coliders = []#array de los coliders asociados al circulo
 posiciones = []
 
 LETRAS = 65 #letras desde la A hasta la Z #65 // 91
@@ -14,14 +14,16 @@ CIRCLE_SIZE = 15,15
 RADIO = 5
 cont = 0
 
+##componentes
+tipocomponente = "cable"
+
 #COLORES
 BLANCO = 255,255,255
 ROJO=255,0,0
 
 def drawNodo (mouse_position):
-    #Crear un rectángulo que envuelve al círculo
     a,b=mouse_position
-    #procedemos a guardar todo
+    #procedemos a cambiar la posición
     if len(posiciones)>=1:
         x1, y1 = posiciones[cont-1]
         if(round((a-x1)/100) != 0):
@@ -44,8 +46,10 @@ def drawNodo (mouse_position):
         posiciones.append([a,b])
     else:
         posiciones.append([a,b])
-    pygame.draw.circle(screen,BLANCO,posiciones[cont],5)                  
+
+    #pygame.draw.line(screen,BLANCO,posiciones[cont-1],posiciones[cont],5)                  
     
+#Lineas del circuito
 def drawlines ():
     pygame.draw.line(screen,BLANCO,start_pos=(posiciones[cont-1]),end_pos=(posiciones[cont]),width=5)
 
@@ -88,22 +92,37 @@ def drawresistancedown ():
         pygame.draw.line(screen, BLANCO, (x1- 20, y+10), (x1+ 20, y+20), 5)
     pygame.draw.line(screen, BLANCO, (x2+20, y2-37), (x2, y2-30), 5)
 
-
-def reactCircle (mouse_position , i):
-    #calculando la distancia entre el mouse y el nodo
-    # Calcular la distancia entre el centro del círculo y el mouse
-    a, b=mouse_position
-    distance = math.sqrt((a - posiciones[i][0]) ** 2 + (b-posiciones[i][1]) ** 2)
-    if distance <= RADIO:
-        pygame.draw.circle(screen, ROJO,posiciones[i],RADIO)
-        time.sleep(0.2)
-    else:    
-        pygame.draw.circle(screen,BLANCO,posiciones[i], RADIO)
+#Voltaje
+def drawvoltageY ():
+    x1, y1 = posiciones[cont-1]
+    x2, y2 = posiciones[cont]
     
+    if(y1 > y2):
+        c = y1
+        y1 = y2
+        y2 = c
+    
+    pygame.draw.line(screen, BLANCO, (x1,y1), (x1, ((y1+y2)/2)-5), 5)  # Node 1 connection
+    pygame.draw.line(screen, BLANCO, (x2, ((y1+y2)/2)+5), (x2,y2), 5)  # Node 2 connection
+    pygame.draw.line(screen, BLANCO, (x1-20,((y1+y2)/2)-5), (x1+20, ((y1+y2)/2)-5), 5)  
+    pygame.draw.line(screen, BLANCO, (x2-10, ((y1+y2)/2)+5), (x2+10,((y1+y2)/2)+5), 5)
+
+def drawvoltageX ():
+    x1, y1 = posiciones[cont-1]
+    x2, y2 = posiciones[cont]
+    
+    if(x1 > x2):
+        c = x1
+        x1 = x2
+        x2 = c
+    
+    pygame.draw.line(screen, BLANCO, (x1,y1), (((x1+x2)/2)-5, y1), 5)  # Node 1 connection
+    pygame.draw.line(screen, BLANCO, (((x1+x2)/2)+5, y2), (x2,y2), 5)  # Node 2 connection
+    pygame.draw.line(screen, BLANCO, (((x1+x2)/2)-5,y1+20), (((x1+x2)/2)-5, y1-20), 5)  
+    pygame.draw.line(screen, BLANCO, (((x1+x2)/2)+5, y2+10), (((x1+x2)/2)+5,y2-10), 5)    
 
 def estado_normal(i):    
     pygame.draw.circle(screen,BLANCO,posiciones[i][0], posiciones[i][1], RADIO)
-
 
 pygame.init ()
 width, height = 1200, 600 #tama no de la ventana
@@ -117,10 +136,6 @@ dimxC= (width-300)/nxC
 dimyC= height/nyC
 #dimensiones
 #colores rgb (255,255,255)
-
-#puntos de poligono
-
-#posicion del mouse
 
 run=True#ejecutar//booleano
 
@@ -139,8 +154,6 @@ while run:#logica que se ejecutara durante todo el simulador
             ]
             pygame.draw.polygon(screen, (128,128,128), poly,1)#ultimo argumento es para el grosos sino se pinta todo
         #pygame.display.flip()
-    #pygame.draw.circle(screen,BLANCO,(200,200),10 )#pantalla, color,posicion, radio
-    #pygame.draw.line(screen,BLANCO,start_pos=(200,200),end_pos=(100,100),width=1)
     pygame.display.flip()
     #ya dibujamos
     for event in pygame.event.get():#obtenemos todos los eventos
@@ -156,36 +169,40 @@ while run:#logica que se ejecutara durante todo el simulador
                 print(f"Nodo: {chr(LETRAS)} creado")
 
                 drawNodo(mouse_position)
-                if event.type == pygame.KEYDOWN:
-                    key_name = pygame.key.name(event.key)
-                    if key_name == 'space':
-                        if pygame.mouse.get_pressed()[0]:
-                            if len(nodos)>1:
-                                drawlines()
+                
+                if keyboard.is_pressed("a"):
+                    tipocomponente = "RESISTENCIA"
+                elif keyboard.is_pressed("b"):
+                    tipocomponente = "VOLTAJE"
 
-                if pygame.mouse.get_pressed()[2]:
+                if pygame.mouse.get_pressed()[0]:
                     if len(nodos)>1:
-                        x,y = mouse_position
-                        x1, y1 = posiciones[cont-1]
-                        if(abs(x1 - x) > abs(y1 - y)):
-                            drawresistanceright()
-                        else:
-                            drawresistancedown()
+                        drawlines()
+                
+                if pygame.mouse.get_pressed()[2]:
+                    if(tipocomponente == "RESISTENCIA"):
+                        if len(nodos)>1:
+                            x,y = mouse_position
+                            x1, y1 = posiciones[cont-1]
+                            if(abs(x1 - x) > abs(y1 - y)):
+                                drawresistanceright()
+                            else:
+                                drawresistancedown()
+                    elif(tipocomponente == "VOLTAJE"):
+                        if len(nodos)>1:
+                            x,y = mouse_position
+                            x1, y1 = posiciones[cont-1]
+                            if(abs(x1 - x) > abs(y1 - y)):
+                                drawvoltageX()
+                            else:
+                                drawvoltageY()
                 a,b=mouse_position
-                colider = pygame.Rect(a -RADIO, b -RADIO, RADIO * 2, RADIO * 2)
-                array_coliders.append(colider)
     
                 LETRAS=LETRAS+1
                 print(posiciones[cont])
                 cont=cont+1
                 pass
-            #print(event)
-        
-        elif len(nodos)>0:
-            i=0
-            for nodo in nodos:
-                reactCircle(mouse_position, i)
-                i+=1 
+            #print(event) 
         
     pygame.display.update()
 
