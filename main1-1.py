@@ -32,10 +32,7 @@ def nodo_existente(posicion):
 def drawNodo (mouse_position):
     a,b=mouse_position
     #procedemos a cambiar la posición
-    if len(posiciones)>=1:
-        # Encuentra el nodo más cercano a la posición del mouse
-        closest_node = min(posiciones, key=lambda node: abs(mouse_position[0] - node[0]) + abs(mouse_position[1] - node[1]))
-
+    if len(posiciones)%2 != 0 and len(posiciones)>=1:
         #Redirecciona la posición del mouse en una escala de 100 pixeles
         x1, y1 = posiciones[cont-1]
         if(round((a-x1)/100) != 0):
@@ -49,13 +46,40 @@ def drawNodo (mouse_position):
             b = y1
         posiciones.append([a,b])
 
-        # Dibuja una línea horizontal o vertical desde el nodo seleccionado
-        if abs(mouse_position[0] - closest_node[0]) < abs(mouse_position[1] - closest_node[1]):
-            draw_line(closest_node)
-        else:
-            draw_line(closest_node)
+        if(tipocomponente != "RESISTENCIA" and tipocomponente != "VOLTAJE"):
+            # Dibuja una línea horizontal o vertical desde el nodo seleccionado
+            draw_line(posiciones[cont-1])
+        elif(tipocomponente == "RESISTENCIA"):
+            x,y = mouse_position
+            x1, y1 = posiciones[cont-1]
+            if(abs(x1 - x) > abs(y1 - y)):
+                drawresistanceright()
+            else:
+                drawresistancedown()
+        elif(tipocomponente == "VOLTAJE"):
+            x,y = mouse_position
+            x1, y1 = posiciones[cont-1]
+            if(abs(x1 - x) > abs(y1 - y)):
+                drawvoltageX()
+            else:
+                drawvoltageY()
+            
+            
     else:
-        posiciones.append([a,b])
+        if(len(posiciones)>=1):
+            x1, y1 = posiciones[cont-1]
+            if(round((a-x1)/100) != 0):
+                a = round((a-x1)/100)*100+x1
+            elif round((a-x1)/100) == 0:
+                a = x1
+
+            if(round((b-y1)/100) != 0):
+                b = round((b-y1)/100)*100+y1
+            elif round((b-y1)/100) == 0:
+                b = y1
+            posiciones.append([a,b])
+        else:
+            posiciones.append([a,b])
     pygame.draw.circle(screen,BLANCO,posiciones[cont],5)                       
                     
 
@@ -174,36 +198,14 @@ while run:#logica que se ejecutara durante todo el simulador
                 Nombre_nodos.append(chr(LETRAS))#guardamos tmbn su nombre
                 print(f"Nodo: {chr(LETRAS)} creado")
                 
-                drawNodo(mouse_position)
-                
                 if keyboard.is_pressed("a"):
                     tipocomponente = "RESISTENCIA"
-                elif keyboard.is_pressed("b"):
+                elif keyboard.is_pressed("s"):
                     tipocomponente = "VOLTAJE"
+                elif keyboard.is_pressed("d"):
+                    tipocomponente = "CABLE"
                 
-                if(len(posiciones) > 1):
-                    if pygame.mouse.get_pressed()[0]:
-                        pass
-                        #if len(nodos)>1:
-                            #drawlines()
-
-                if pygame.mouse.get_pressed()[2]:
-                    if(tipocomponente == "RESISTENCIA"):
-                        if len(nodos)>1:
-                            x,y = mouse_position
-                            x1, y1 = posiciones[cont-1]
-                            if(abs(x1 - x) > abs(y1 - y)):
-                                drawresistanceright()
-                            else:
-                                drawresistancedown()
-                    elif(tipocomponente == "VOLTAJE"):
-                        if len(nodos)>1:
-                            x,y = mouse_position
-                            x1, y1 = posiciones[cont-1]
-                            if(abs(x1 - x) > abs(y1 - y)):
-                                drawvoltageX()
-                            else:
-                                drawvoltageY()
+                drawNodo(mouse_position)
     
                 LETRAS=LETRAS+1
                 cont = cont + 1
