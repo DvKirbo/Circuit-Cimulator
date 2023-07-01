@@ -1,6 +1,7 @@
 import core2 as core
 import pygame
 import keyboard
+import sys
 import math
 import time
 
@@ -21,37 +22,48 @@ tipocomponente = "cable"
 BLANCO = 255,255,255
 ROJO=255,0,0
 
+def nodo_existente(posicion):
+    for i in range(len(posiciones)):
+        if posiciones[i] == posicion:
+            valor1 = i
+            valor2 = True
+            return valor1,valor2
+    return False
+
 def drawNodo (mouse_position):
     a,b=mouse_position
     #procedemos a cambiar la posición
     if len(posiciones)>=1:
+        # Encuentra el nodo más cercano a la posición del mouse
+        closest_node = min(posiciones, key=lambda node: abs(mouse_position[0] - node[0]) + abs(mouse_position[1] - node[1]))
+        print(closest_node)
+
+        #Redirecciona la posición del mouse en una escala de 100 pixeles
         x1, y1 = posiciones[cont-1]
         if(round((a-x1)/100) != 0):
             a = round((a-x1)/100)*100+x1
         elif round((a-x1)/100) == 0:
-            #if ((a-x1)/100) > 0:
-                #a = x1+100
-            #else:
-                #a = x1-100
             a = x1
 
         if(round((b-y1)/100) != 0):
             b = round((b-y1)/100)*100+y1
         elif round((b-y1)/100) == 0:
-            #if ((b-y1)/100) > 0:
-                #b = y1+100
-            #else:
-                #b = y1-100
             b = y1
         posiciones.append([a,b])
+
+        # Dibuja una línea horizontal o vertical desde el nodo seleccionado
+        if(nodo_existente((a,b)) == 1,True):
+            print("hola")
+            pygame.draw.line(screen, BLANCO, closest_node, posiciones[nodo_existente((a, b))], 5)
+        else:
+            if abs(mouse_position[0] - closest_node[0]) < abs(mouse_position[1] - closest_node[1]):
+                draw_line(closest_node)
+            else:
+                draw_line(closest_node)
     else:
         posiciones.append([a,b])
-
-    #pygame.draw.line(screen,BLANCO,posiciones[cont-1],posiciones[cont],5)                  
-    
-#Lineas del circuito
-def drawlines ():
-    pygame.draw.line(screen,BLANCO,start_pos=(posiciones[cont-1]),end_pos=(posiciones[cont]),width=5)
+    pygame.draw.circle(screen,BLANCO,posiciones[cont],5)                       
+                    
 
 #Resistores, tanto en horizontal como en vertical
 def drawresistanceright ():
@@ -121,15 +133,17 @@ def drawvoltageX ():
     pygame.draw.line(screen, BLANCO, (((x1+x2)/2)-5,y1+20), (((x1+x2)/2)-5, y1-20), 5)  
     pygame.draw.line(screen, BLANCO, (((x1+x2)/2)+5, y2+10), (((x1+x2)/2)+5,y2-10), 5)    
 
-def estado_normal(i):    
-    pygame.draw.circle(screen,BLANCO,posiciones[i][0], posiciones[i][1], RADIO)
+#################PRUEBA#################
+def draw_line(start_pos):
+    pygame.draw.line(screen, (255, 255, 255), start_pos, posiciones[cont], 5)
 
 pygame.init ()
 width, height = 1200, 600 #tama no de la ventana
 screen = pygame.display.set_mode((width, height))
 bg = 25,25,25 #rgb colors
 screen.fill(bg)#llenamos o pintamos de ese color
-
+imagen1 = pygame.image.load("daimakura gawr gura.jpg")
+screen.blit(imagen1,(900,00))
 #creando la malla
 nxC, nyC = 30,20
 dimxC= (width-300)/nxC
@@ -167,18 +181,20 @@ while run:#logica que se ejecutara durante todo el simulador
                 nodos.append(core.Nodo(LETRAS))#añadimos a la lista el objeto nodo
                 Nombre_nodos.append(chr(LETRAS))#guardamos tmbn su nombre la ptmre
                 print(f"Nodo: {chr(LETRAS)} creado")
-
+                
                 drawNodo(mouse_position)
                 
                 if keyboard.is_pressed("a"):
                     tipocomponente = "RESISTENCIA"
                 elif keyboard.is_pressed("b"):
                     tipocomponente = "VOLTAJE"
-
-                if pygame.mouse.get_pressed()[0]:
-                    if len(nodos)>1:
-                        drawlines()
                 
+                if(len(posiciones) > 1):
+                    if pygame.mouse.get_pressed()[0]:
+                        pass
+                        #if len(nodos)>1:
+                            #drawlines()
+
                 if pygame.mouse.get_pressed()[2]:
                     if(tipocomponente == "RESISTENCIA"):
                         if len(nodos)>1:
@@ -199,8 +215,9 @@ while run:#logica que se ejecutara durante todo el simulador
                 a,b=mouse_position
     
                 LETRAS=LETRAS+1
+                print(cont)
                 print(posiciones[cont])
-                cont=cont+1
+                cont = cont + 1
                 pass
             #print(event) 
         
