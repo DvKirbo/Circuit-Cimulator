@@ -65,7 +65,6 @@ def drawNodo (mouse_position):
             posiciones.append([a,b])
 
             # Dibuja una línea horizontal o vertical desde el nodo seleccionado
-            
             if abs(mouse_position[0] - closest_node[0]) < abs(mouse_position[1] - closest_node[1]):
                 draw_line(closest_node)
             else:
@@ -152,20 +151,19 @@ width, height = 1200, 600 #tama no de la ventana
 screen = pygame.display.set_mode((width, height))
 bg = 25,25,25 #rgb colors
 screen.fill(bg)#llenamos o pintamos de ese color
+
 imagen1 = pygame.image.load("daimakura gawr gura.jpg")
 screen.blit(imagen1,(900,00))
+
 #creando la malla
 nxC, nyC = 30,20
 dimxC= (width-300)/nxC
 dimyC= height/nyC
-#dimensiones
-#colores rgb (255,255,255)
 
 run=True#ejecutar//booleano
 
 while run:#logica que se ejecutara durante todo el simulador
-    mouse_position = pygame.mouse.get_pos()#no estoy tomando la posicion del mous
-    #creamos colider para el puntero
+    mouse_position = pygame.mouse.get_pos()
     
     for y in range (0,nyC):
         for x in range (0,nxC):
@@ -177,7 +175,6 @@ while run:#logica que se ejecutara durante todo el simulador
 
             ]
             pygame.draw.polygon(screen, (128,128,128), poly,1)#ultimo argumento es para el grosos sino se pinta todo
-        #pygame.display.flip()
     pygame.display.flip()
     #ya dibujamos
     for event in pygame.event.get():#obtenemos todos los eventos
@@ -189,7 +186,7 @@ while run:#logica que se ejecutara durante todo el simulador
         elif event.type == pygame.MOUSEBUTTONDOWN:
                 #usar array de nodo para guardar las variables
                 nodos.append(core.Nodo(LETRAS))#añadimos a la lista el objeto nodo
-                Nombre_nodos.append(chr(LETRAS))#guardamos tmbn su nombre la ptmre
+                Nombre_nodos.append(chr(LETRAS))#guardamos tmbn su nombre
                 print(f"Nodo: {chr(LETRAS)} creado")
                 
                 drawNodo(mouse_position)
@@ -222,7 +219,7 @@ while run:#logica que se ejecutara durante todo el simulador
                                 drawvoltageX()
                             else:
                                 drawvoltageY()
-                a,b=mouse_position
+                #a,b=mouse_position
     
                 LETRAS=LETRAS+1
                 cont = cont + 1
