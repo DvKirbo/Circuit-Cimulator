@@ -1,6 +1,7 @@
 import core2 as core
 import pygame
 import keyboard
+import heapq
 import sys
 import math
 import time
@@ -22,12 +23,19 @@ tipocomponente = "cable"
 BLANCO = 255,255,255
 ROJO=255,0,0
 
+def find_closest_nodes(mouse_position, nodes, k=2):
+    closest_nodes = heapq.nsmallest(k, nodes, key=lambda node: distance(mouse_position, node))
+    return closest_nodes
+
+def distance(pos1, pos2):
+    x1, y1 = pos1
+    x2, y2 = pos2
+    return abs(x2 - x1) + abs(y2 - y1)
+
 def nodo_existente(posicion):
-    for i in range(len(posiciones)):
-        if posiciones[i] == posicion:
-            valor1 = i
-            valor2 = True
-            return valor1,valor2
+    for node in posiciones:
+        if node == posicion:
+            return True
     return False
 
 def drawNodo (mouse_position):
@@ -36,26 +44,28 @@ def drawNodo (mouse_position):
     if len(posiciones)>=1:
         # Encuentra el nodo más cercano a la posición del mouse
         closest_node = min(posiciones, key=lambda node: abs(mouse_position[0] - node[0]) + abs(mouse_position[1] - node[1]))
-        print(closest_node)
 
-        #Redirecciona la posición del mouse en una escala de 100 pixeles
-        x1, y1 = posiciones[cont-1]
-        if(round((a-x1)/100) != 0):
-            a = round((a-x1)/100)*100+x1
-        elif round((a-x1)/100) == 0:
-            a = x1
-
-        if(round((b-y1)/100) != 0):
-            b = round((b-y1)/100)*100+y1
-        elif round((b-y1)/100) == 0:
-            b = y1
-        posiciones.append([a,b])
-
-        # Dibuja una línea horizontal o vertical desde el nodo seleccionado
-        if(nodo_existente((a,b)) == 1,True):
+        if(nodo_existente((a,b)) == True):
             print("hola")
-            pygame.draw.line(screen, BLANCO, closest_node, posiciones[nodo_existente((a, b))], 5)
+            closest_nodes = find_closest_nodes(mouse_position, posiciones, k=2)
+            print(closest_nodes)
+            pygame.draw.line(screen, BLANCO, closest_nodes[0], closest_nodes[1], 5)
         else:
+            #Redirecciona la posición del mouse en una escala de 100 pixeles
+            x1, y1 = posiciones[cont-1]
+            if(round((a-x1)/100) != 0):
+                a = round((a-x1)/100)*100+x1
+            elif round((a-x1)/100) == 0:
+                a = x1
+
+            if(round((b-y1)/100) != 0):
+                b = round((b-y1)/100)*100+y1
+            elif round((b-y1)/100) == 0:
+                b = y1
+            posiciones.append([a,b])
+
+            # Dibuja una línea horizontal o vertical desde el nodo seleccionado
+            
             if abs(mouse_position[0] - closest_node[0]) < abs(mouse_position[1] - closest_node[1]):
                 draw_line(closest_node)
             else:
@@ -215,8 +225,6 @@ while run:#logica que se ejecutara durante todo el simulador
                 a,b=mouse_position
     
                 LETRAS=LETRAS+1
-                print(cont)
-                print(posiciones[cont])
                 cont = cont + 1
                 pass
             #print(event) 
