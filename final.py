@@ -6,7 +6,7 @@ n = int(input("Ingrese el número de nodos: "))
 # Obtener el número de fuentes de voltaje
 num_fuentes_voltaje = int(input("Ingrese la cantidad de fuentes de voltaje: "))
 
-# Obtener el número de resistencias
+# Obtener el número de resistencias3
 num_resistencias = int(input("Ingrese la cantidad de resistencias: "))
 
 # Crear una lista vacía para almacenar las resistencias

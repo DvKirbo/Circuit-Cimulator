@@ -1,10 +1,46 @@
-import core2 as core
+import Boton as core
 import pygame
 import keyboard
 import pygame_gui
 import sys
 import math
 import time
+
+class Cables:
+    def __init__(self, nombre, pos_inicial, pos_final, valor):
+        self.nombre = nombre
+        self.pos_inicial = pos_inicial
+        self.pos_final = pos_final
+        self.valor = valor
+        pass
+
+press = True
+
+class Boton:
+    def __init__(self, text, x, y, enabled):
+        self.text = text
+        self.x = x
+        self.y = y
+        self.enabled = enabled
+        self.draw()
+
+    def draw(self):
+        button_text = font.render(self.text, True, 'Black')
+        button_rect = pygame.rect.Rect((self.x, self.y), (180, 20))
+        if self.check_click():
+            pygame.draw.rect(screen, 'dark gray', button_rect, 0, 5)
+        else:
+            pygame.draw.rect(screen, 'gray', button_rect, 0, 5)
+        screen.blit(button_text, (self.x + 3,self.y + 3))
+
+    def check_click(self):
+        mouse_position = pygame.mouse.get_pos()
+        left_click = pygame.mouse.get_pressed()[0]
+        button_rect = pygame.rect.Rect((self.x, self.y), (150, 20))
+        if(left_click and button_rect.collidepoint(mouse_position) and self.enabled):
+            return True
+        else: 
+            return False
 
 posiciones = []
 posicionesImportantes = []
@@ -26,7 +62,7 @@ RADIO = 3
 tipocomponente = "cable"
 
 #NODOS
-def drawNodo (mouse_position):
+def drawTODO (mouse_position):
     a,b=mouse_position
     #procedemos a cambiar la posición
     if len(posiciones)%2 != 0 and len(posiciones)>=1:
@@ -56,6 +92,7 @@ def drawNodo (mouse_position):
             resistencias.append(100)
             pos_resistencias_inicial.append((x1,y1))
             pos_resistencias_final.append((a,b))
+
         elif(tipocomponente == "VOLTAJE"):
             x,y = mouse_position
             x1, y1 = posiciones[cont-1]
@@ -205,23 +242,17 @@ def update_text(i,value,lazaro):
         text = f"Voltaje n° {i+1}: {value}"
 
 def draw_surface():
-    # Crear una superficie con fondo transparente
     surface = pygame.Surface((300, 200), pygame.SRCALPHA)
-    surface.fill((0, 0, 0, 128))  # Fondo semitransparente
+    surface.fill((0, 0, 0, 128))
     
-    # Dibujar el borde de la superficie
     pygame.draw.rect(surface, ORANGE, surface.get_rect(), 2)
     
-    # Renderizar el texto en la superficie
     text_surface = font.render(text, True, ORANGE)
     
-    # Centrar el texto en la superficie
     text_rect = text_surface.get_rect(center=(100, 50))
     
-    # Dibujar el texto en la superficie
     surface.blit(text_surface, text_rect)
     
-    # Dibujar la superficie en la esquina superior izquierda de la ventana principal
     screen.blit(surface, (900, 400))
 
 #creando la malla
@@ -238,6 +269,16 @@ while run:#logica que se ejecutara durante todo el simulador
     mouse_position = pygame.mouse.get_pos()
     pygame.draw.rect(screen, (0, 0, 255), screen.get_rect(), 2)
 
+    boton1 = Boton("Solucionar circuito", 900, 380, True)
+
+    if pygame.mouse.get_pressed()[0] and press:
+        press = False
+        if boton1.check_click():
+            if boton1.enabled:
+                boton1.enabled = False
+            else:
+                boton1.enabled = True
+
     for event in pygame.event.get():#obtenemos todos los eventos
       
         if event.type == pygame.QUIT:
@@ -253,7 +294,7 @@ while run:#logica que se ejecutara durante todo el simulador
                 tipocomponente = "CABLE"
                 
             if pygame.mouse.get_pressed()[0]:
-                drawNodo(mouse_position)
+                drawTODO(mouse_position)
                 cont = cont + 1
                     
             elif pygame.mouse.get_pressed()[2]:
