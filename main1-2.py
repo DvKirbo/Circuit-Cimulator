@@ -1,18 +1,9 @@
-import Boton as core
 import pygame
 import keyboard
 import pygame_gui
 import sys
 import math
 import time
-
-class Cables:
-    def __init__(self, nombre, pos_inicial, pos_final, valor):
-        self.nombre = nombre
-        self.pos_inicial = pos_inicial
-        self.pos_final = pos_final
-        self.valor = valor
-        pass
 
 press = True
 
@@ -48,6 +39,7 @@ posicionesImportantes = []
 resistencias = []
 pos_resistencias_inicial = []
 pos_resistencias_final = []
+
 voltajes = []
 pos_voltajes_inicial = []
 pos_voltajes_final = []
@@ -213,6 +205,19 @@ def drawvoltageX ():
 def draw_line(start_pos):
     pygame.draw.line(screen, (128,128,128), start_pos, posiciones[cont], 3)
 
+#ECUACIONES DE CADA NODO
+def ecuaciones_en_nodos():
+    for i in range (len(posicionesImportantes)):
+        #valores de las resistencias
+        
+        a,b = posicionesImportantes[i]
+        for j in range (len(pos_resistencias_final)):
+            x,y = pos_resistencias_final[j]
+            x1,y1 = pos_resistencias_inicial[j]
+            if a-100 == x or a-100 == x1:
+                pass
+        pass
+
 #PANTALLA PRINCIPAL
 pygame.init ()
 width, height = 1200, 600 #tama no de la ventana
@@ -221,8 +226,6 @@ screen = pygame.display.set_mode((width, height))
 bg = 0,0,0 #rgb colors
 screen.fill(bg)#llenamos o pintamos de ese color
 pygame.display.set_caption("Simulador de circuitos simples mediante análisis modal")
-imagen1 = pygame.image.load("daimakura gawr gura.jpg")
-screen.blit(imagen1,(900,00))
 
 #TEXTO 
 # Definir los colores
@@ -270,14 +273,36 @@ while run:#logica que se ejecutara durante todo el simulador
     pygame.draw.rect(screen, (0, 0, 255), screen.get_rect(), 2)
 
     boton1 = Boton("Solucionar circuito", 900, 380, True)
+    boton_borrar = Boton("Borrar todo", 900, 355, True)
 
     if pygame.mouse.get_pressed()[0] and press:
         press = False
-        if boton1.check_click():
-            if boton1.enabled:
-                boton1.enabled = False
+        if boton_borrar.check_click():
+            if boton_borrar.enabled:
+                screen.fill(bg)
+                posiciones = []
+                posicionesImportantes = []
+
+                resistencias = []
+                pos_resistencias_inicial = []
+                pos_resistencias_final = []
+                voltajes = []
+                pos_voltajes_inicial = []
+                pos_voltajes_final = []
+
+                cont = 0
+                cantImportante = 0
+                boton_borrar.enabled = False
             else:
-                boton1.enabled = True
+                boton_borrar.enabled = True
+        if boton1.check_click():
+            if boton_borrar.enabled:
+                ecuaciones()
+                boton_borrar.enabled = False
+            else:
+                boton_borrar.enabled = True
+    if not pygame.mouse.get_pressed()[0] and not press:
+        press = True
 
     for event in pygame.event.get():#obtenemos todos los eventos
       
@@ -292,14 +317,17 @@ while run:#logica que se ejecutara durante todo el simulador
                 tipocomponente = "VOLTAJE"
             elif keyboard.is_pressed("d"):
                 tipocomponente = "CABLE"
-                
-            if pygame.mouse.get_pressed()[0]:
-                drawTODO(mouse_position)
-                cont = cont + 1
-                    
-            elif pygame.mouse.get_pressed()[2]:
-                drawimportantnodo(mouse_position)
-                cantImportante = cantImportante + 1
+            
+            a,b = mouse_position
+
+            if a < 900:
+                if pygame.mouse.get_pressed()[0]:
+                    drawTODO(mouse_position)
+                    cont = cont + 1
+                        
+                elif pygame.mouse.get_pressed()[2]:
+                    drawimportantnodo(mouse_position)
+                    cantImportante = cantImportante + 1
             
     mouse_x, mouse_y = pygame.mouse.get_pos()
 
